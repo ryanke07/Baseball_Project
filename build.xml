@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Baseball_Project" basedir=".">
+
+  <target name="clean" description="Delete all generated class files">
+    <delete dir="classes/main/code"/>
+  </target>
+
+  <target name="compile" description="Compiles the Task">
+    <mkdir dir="classes/main/code"/>
+    <javac srcdir="src/main/code" destdir="classes/main/code"/>
+  </target>
+
+</project>
