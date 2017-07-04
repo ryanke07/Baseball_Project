@@ -1,8 +1,16 @@
+package src.main.code;
+
 
 import java.sql.SQLException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.BufferedReader;
 
 public class BaseballUtilities {
 
+    private static String pathToResources = 
+            "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/main/resources/";
+    
     public static void printSQLException(SQLException ex) {
       for (Throwable e : ex) {
 	if (e instanceof SQLException) {
@@ -18,5 +26,37 @@ public class BaseballUtilities {
 	}
       }
     }
-
+    
+    /* Purpose: Check a username/password combination for validity
+    *
+    * param: username - A String representing the user login
+    * param: password - A String representing the user password
+    * return: true if the combination is valid, false otherwise
+    */
+    public static boolean checkLogin(final String username, final String password)
+    {
+        if (username == null || password == null || 
+                username.isEmpty() || password.isEmpty()) {
+            return false;
+        }
+        //Open the login information file
+        try (BufferedReader br = 
+                new BufferedReader(new FileReader(pathToResources + "login.txt"))) {
+          //Parse the input: username password -> line format
+          String l;
+          while ((l = br.readLine()) != null) {
+              String result[] = l.split("\\s");
+              if (result[0] != null && result[1] != null && 
+                      result[0].equals(username) && 
+                      result[1].equals(password)) {
+                  return true;
+              }
+          }
+        } catch (IOException e) {
+          System.err.println("The login file was unavailable!");
+          System.exit(1);
+        } 
+        
+        return false;
+    }
 } //end of class
