@@ -59,4 +59,8 @@ public class BaseballUtilities {
         
         return false;
     }
+    
+    public static void addUser(String username, String password) {
+        //TODO: write login information to login.txt
+    }
 } //end of class
