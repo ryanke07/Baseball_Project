@@ -43,8 +43,8 @@ public class MainBaseballFrame extends JFrame
     //TODO: Either open a dialog for the button click or create a new frame
     loginButton.addActionListener(new ActionListener() {
        public void actionPerformed(ActionEvent e) {
-           BaseballUtilities.checkLogin("generic", "login");
-           
+          PasswordDialog pd = new PasswordDialog(null, true);
+          pd.setVisible(true);
            
        } //actionPerformed
     }); //actionListener
