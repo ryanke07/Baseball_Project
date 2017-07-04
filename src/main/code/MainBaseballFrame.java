@@ -1,3 +1,5 @@
+package src.main.code;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,8 +43,9 @@ public class MainBaseballFrame extends JFrame
     //TODO: Either open a dialog for the button click or create a new frame
     loginButton.addActionListener(new ActionListener() {
        public void actionPerformed(ActionEvent e) {
-         String username = JOptionPane.showInputDialog(
-	        	MainBaseballFrame.this, "Username");
+           BaseballUtilities.checkLogin("generic", "login");
+           
+           
        } //actionPerformed
     }); //actionListener
   } //constructor
