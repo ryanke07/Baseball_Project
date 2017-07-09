@@ -1,8 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* TODO: user can exit window and bypass security check! */
+
 package src.fb.view;
 
 import java.awt.Image;
@@ -21,8 +18,8 @@ public class PasswordDialog extends javax.swing.JDialog {
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
-    private String login;
-    private String password;
+    private String login = null;
+    private String password = null;
     /**
      * Creates new form PasswordDialog
      */
@@ -57,7 +54,10 @@ public class PasswordDialog extends javax.swing.JDialog {
         });
     }
     
+    /* Returns null if no input could be gotten */
     public String[] getValidatedText() {
+        if (login == null & password == null) return null;
+        
         String[] text = new String[2];
         text[0] = login;
         text[1] = password;
