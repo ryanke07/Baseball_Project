@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
  * @author dianeyanke
  */
 public class PasswordDialog extends javax.swing.JDialog {
-
     //Picture for the upper-right corner of the dialog
     String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
@@ -28,6 +27,7 @@ public class PasswordDialog extends javax.swing.JDialog {
     public PasswordDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setLocationRelativeTo(parent);
        
         loginButton.addActionListener(new ActionListener() {
             
@@ -73,6 +73,7 @@ public class PasswordDialog extends javax.swing.JDialog {
         picLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setLocation(new java.awt.Point(300, 300));
         setPreferredSize(new java.awt.Dimension(400, 300));
 
         jLabel1.setText("Username");
