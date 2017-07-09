@@ -18,9 +18,11 @@ import javax.swing.JOptionPane;
  */
 public class PasswordDialog extends javax.swing.JDialog {
     //Picture for the upper-right corner of the dialog
-    String path =
+    private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
-    String file = "baseballpic.jpg";
+    private final String file = "baseballpic.jpg";
+    private String login;
+    private String password;
     /**
      * Creates new form PasswordDialog
      */
@@ -32,27 +34,35 @@ public class PasswordDialog extends javax.swing.JDialog {
         loginButton.addActionListener(new ActionListener() {
             
             public void actionPerformed(ActionEvent evt) {
-                String user = usernameField.getText();
-                String pass = passwordField.getText();
+                login = usernameField.getText();
+                password = passwordField.getText();
                 
-                boolean isValid = BaseballUtilities.checkLogin(user, pass);
+                boolean isValid = BaseballUtilities.checkLogin(login, password);
                 
                 if (!isValid) {
                     int selection = 
                             JOptionPane.showConfirmDialog(loginButton, 
                               "No match found.  Add new user?");
                     
-                    if (selection == 0) BaseballUtilities.addUser(user,pass);
+                    if (selection == 0) BaseballUtilities.addUser(login,password);
                     else if (selection== 1) {
                         //User cannot continue
                         System.exit(2);
                     }
                 }
+                else {
+                    dispose();
+                }
             }
         });
     }
     
-   
+    public String[] getValidatedText() {
+        String[] text = new String[2];
+        text[0] = login;
+        text[1] = password;
+        return text;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
