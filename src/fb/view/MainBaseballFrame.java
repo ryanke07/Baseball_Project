@@ -51,7 +51,12 @@ public class MainBaseballFrame extends JFrame
           
           //user inputs login information and we move on to next screen
           String[] loginInfo = pd.getValidatedText();
-          switchPanel(MainBaseballFrame.this, tl);
+          if (loginInfo != null) {
+            switchPanel(MainBaseballFrame.this, tl);
+          } else {
+              //CLEAN UP: replace with clean up function call
+              System.exit(1);
+          }
            
        } //actionPerformed
     }); //actionListener
