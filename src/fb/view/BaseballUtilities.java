@@ -18,7 +18,7 @@ public class BaseballUtilities {
 
 
     private static String pathToResources = 
-            "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/main/resources/";
+            "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
 
     
 
