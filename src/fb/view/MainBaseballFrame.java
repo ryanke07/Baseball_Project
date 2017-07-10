@@ -54,7 +54,7 @@ public class MainBaseballFrame extends JFrame
           if (loginInfo != null) {
             switchPanel(MainBaseballFrame.this, tl);
           } else {
-              //CLEAN UP: replace with clean up function call
+              //CLEAN UP: TODO -- add clean up utility method
               System.exit(1);
           }
            
