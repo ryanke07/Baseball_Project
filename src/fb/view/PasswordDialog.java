@@ -1,4 +1,3 @@
-/* TODO: user can exit window and bypass security check! */
 
 package src.fb.view;
 
@@ -54,9 +53,9 @@ public class PasswordDialog extends javax.swing.JDialog {
         });
     }
     
-    /* Returns null if no input could be gotten */
     public String[] getValidatedText() {
-        if (login == null & password == null) return null;
+        //if the user failed to enter any data or exited the dialog
+        if (login == null && password == null) return null;
         
         String[] text = new String[2];
         text[0] = login;
