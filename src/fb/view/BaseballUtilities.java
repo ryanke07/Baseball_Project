@@ -9,18 +9,17 @@ import java.sql.SQLException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 /**
  *
  * @author dianeyanke
  */
 public class BaseballUtilities {
-  
-
-
+ 
     private static String pathToResources = 
             "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
-
-    
+    private static final String endOfLine = System.getProperty("line.separator");
 
     public static void printSQLException(SQLException ex) {
         
@@ -77,8 +76,19 @@ public class BaseballUtilities {
     }
 
     public static void addUser(String username, String password) {
-
-        //TODO: write login information to login.txt
+        if (username == null || password == null || 
+                username.isEmpty() || password.isEmpty()) {
+            return; //username and password must be at least one character
+        }
+        
+         try (BufferedWriter bw = 
+                new BufferedWriter(new FileWriter(pathToResources + "login.txt", true))) {
+            bw.write(username + " ");
+            bw.write(password + endOfLine);
+         } catch (IOException ex) {
+             System.err.println("The login file was unavailable!");
+             System.exit(1);
+         }
 
     }
 
