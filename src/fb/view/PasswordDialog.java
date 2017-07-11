@@ -40,7 +40,10 @@ public class PasswordDialog extends javax.swing.JDialog {
                             JOptionPane.showConfirmDialog(loginButton, 
                               "No match found.  Add new user?");
                     
-                    if (selection == 0) BaseballUtilities.addUser(login,password);
+                    if (selection == 0) {
+                        BaseballUtilities.addUser(login,password);
+                        dispose();
+                    }
                     else if (selection== 1) {
                         //User cannot continue
                         System.exit(2);
