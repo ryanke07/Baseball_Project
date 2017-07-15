@@ -53,6 +53,7 @@ public class MainBaseballFrame extends JFrame
           //login info and to set up a new session.
           pd.addWindowListener(new WindowAdapter() {
               @Override public void windowClosed(WindowEvent e) {
+                  //TODO: more graceful way?
                   System.exit(1);
               }
           });
@@ -66,7 +67,7 @@ public class MainBaseballFrame extends JFrame
             tl = new TeamList();
             switchPanel(MainBaseballFrame.this, tl);
           } else {
-              //CLEAN UP: TODO -- add clean up utility method
+              //CLEAN UP: TODO -- add clean up utility method?
               System.exit(1);
           }
            
