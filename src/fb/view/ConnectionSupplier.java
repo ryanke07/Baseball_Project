@@ -25,7 +25,6 @@ public class ConnectionSupplier {
     public static Connection getMyConnection() {
         
         Connection connection = null;
-        Statement statement = null;
         try {
            // Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
