@@ -51,12 +51,13 @@ public class MainBaseballFrame extends JFrame
           PasswordDialog pd = new PasswordDialog(MainBaseballFrame.this, true);
           //The program should exit if the user fails both to provide valid
           //login info and to set up a new session.
+          
           pd.addWindowListener(new WindowAdapter() {
-              @Override public void windowClosed(WindowEvent e) {
+              @Override public void windowClosing(WindowEvent e) {
                   //TODO: more graceful way?
                   System.exit(1);
               }
-          });
+          }); 
           pd.setVisible(true);
           
           //user inputs login information and we move on to next screen
