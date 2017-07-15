@@ -9,7 +9,9 @@ public class MainBaseballFrame extends JFrame
 {
   private Toolkit tk = Toolkit.getDefaultToolkit();
   //all panels needed by this application
-  private static final TeamList tl = new TeamList();
+  private static TeamList tl;
+  private static String user;
+  private static String password;
   
   public MainBaseballFrame() {
     this.setSize(400,300);
@@ -52,6 +54,9 @@ public class MainBaseballFrame extends JFrame
           //user inputs login information and we move on to next screen
           String[] loginInfo = pd.getValidatedText();
           if (loginInfo != null) {
+            user = loginInfo[0];
+            password = loginInfo[1];
+            tl = new TeamList();
             switchPanel(MainBaseballFrame.this, tl);
           } else {
               //CLEAN UP: TODO -- add clean up utility method
@@ -62,6 +67,13 @@ public class MainBaseballFrame extends JFrame
     }); //actionListener
   } //constructor
 
+  public static String getSessionUser() {
+      return user;
+  }
+  
+  public static String getSessionPassword() {
+      return password;
+  }
   //Makes the frame visible.
   public void showFrame() {
     this.setVisible(true);
