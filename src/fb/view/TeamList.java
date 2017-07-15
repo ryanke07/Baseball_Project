@@ -8,6 +8,10 @@ package src.fb.view;
 import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -22,6 +26,69 @@ public class TeamList extends javax.swing.JPanel {
      */
     public TeamList() {
         initComponents();
+        
+        /* Code to populate the table using userteam data */
+        
+        //conn is handled elsewhere, but we assume responsibility for closing it
+        // ?? Can we guarantee that conn will not be null ?? 
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+          stmt = conn.createStatement();
+          rs = stmt.executeQuery("select * from userteams");
+          
+          populateTeamsTable(rs);
+          
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        finally {
+           try {
+           conn.close();
+           if (stmt != null) { stmt.close(); }
+           if (rs != null) { rs.close(); }
+           } catch (SQLException e) {
+               //TODO add clean up
+               BaseballUtilities.printSQLException(e);
+           }
+            
+        }
+        
+    }
+    
+    private void populateTeamsTable(ResultSet rs) {
+        
+        try {
+            ResultSetMetaData meta = rs.getMetaData();
+            
+            //Table Header
+            Vector<String> cols = new Vector<String>();
+            int numCols = meta.getColumnCount();
+            //numbering starts from 1!
+            for (int currCol = 1; currCol <= numCols; currCol++) {
+                cols.add(meta.getColumnName(currCol));
+            }
+            
+            //Table Body
+            Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+            while (rs.next()) {
+                Vector<Object> holder = new Vector<Object>();
+                for (int currCol = 1; currCol <= numCols; currCol++) {
+                    holder.add(rs.getObject(currCol));
+                }
+                data.add(holder);
+            }
+            
+            teamsTable.setModel(new DefaultTableModel(data, cols));
+           // teamsTable.fireTableDataChanged();
+            
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        
     }
 
     /**
