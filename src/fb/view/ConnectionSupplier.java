@@ -27,13 +27,15 @@ public class ConnectionSupplier {
         Connection connection = null;
         Statement statement = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+           // Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
                                         databaseURL, user, password);
             return connection;
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (SQLException e) {
+        } 
+     //catch (ClassNotFoundException ex) {
+       //     ex.printStackTrace();
+        //} 
+        catch (SQLException e) {
             BaseballUtilities.printSQLException(e);
         }
         /* Omitting the finally block from lecture.  The caller should assume
