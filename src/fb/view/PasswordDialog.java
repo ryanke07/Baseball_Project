@@ -26,6 +26,7 @@ public class PasswordDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(parent);
+        
        
         loginButton.addActionListener(new ActionListener() {
             
