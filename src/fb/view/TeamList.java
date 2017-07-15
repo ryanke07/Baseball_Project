@@ -36,7 +36,12 @@ public class TeamList extends javax.swing.JPanel {
         ResultSet rs = null;
         try {
           stmt = conn.createStatement();
-          rs = stmt.executeQuery("select * from userteams");
+          rs = stmt.executeQuery("select U.teamID, U.salaryCap, U.name, U.login "
+                                  + "from userteams U where \"" +
+                                  MainBaseballFrame.getSessionUser() +
+                                  "\" = U.login AND \"" +
+                                  MainBaseballFrame.getSessionPassword() + 
+                                  "\" = U.password;");
           
           populateTeamsTable(rs);
           
@@ -102,16 +107,21 @@ public class TeamList extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        teamsTable = new javax.swing.JTable();
         selectTeamButton = new javax.swing.JButton();
         createTeamButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        teamsTable = new javax.swing.JTable();
 
         jLabel1.setFont(new java.awt.Font("Optima", 0, 24)); // NOI18N
         jLabel1.setText("Teams List");
 
         jLabel2.setIcon(new ImageIcon((Toolkit.getDefaultToolkit().getImage(path+file)).getScaledInstance(77, 63, Image.SCALE_DEFAULT)));
         jLabel2.setPreferredSize(new java.awt.Dimension(77, 63));
+
+        selectTeamButton.setText("Select team.");
+
+        createTeamButton.setText("Create new team.");
 
         teamsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -126,9 +136,7 @@ public class TeamList extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(teamsTable);
 
-        selectTeamButton.setText("Select team.");
-
-        createTeamButton.setText("Create new team.");
+        jScrollPane2.setViewportView(jScrollPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -136,18 +144,18 @@ public class TeamList extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(51, 51, 51)
                 .addComponent(selectTeamButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(createTeamButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(158, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,8 +163,8 @@ public class TeamList extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(selectTeamButton)
@@ -171,6 +179,7 @@ public class TeamList extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton selectTeamButton;
     private javax.swing.JTable teamsTable;
     // End of variables declaration//GEN-END:variables
