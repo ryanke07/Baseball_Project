@@ -10,6 +10,7 @@ public class MainBaseballFrame extends JFrame
   private Toolkit tk = Toolkit.getDefaultToolkit();
   //all panels needed by this application
   private static TeamList tl;
+  // private CreateTeam ct;   not sure if this will come in handy
   private static String user;
   private static String password;
   
@@ -65,7 +66,7 @@ public class MainBaseballFrame extends JFrame
           if (loginInfo != null) {
             user = loginInfo[0];
             password = loginInfo[1];
-            tl = new TeamList();
+            tl = new TeamList(MainBaseballFrame.this);
             switchPanel(MainBaseballFrame.this, tl);
           } else {
               //CLEAN UP: TODO -- add clean up utility method?

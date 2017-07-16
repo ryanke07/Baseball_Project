@@ -7,10 +7,13 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
+import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,8 +27,15 @@ public class TeamList extends javax.swing.JPanel {
     /**
      * Creates new form TeamList
      */
-    public TeamList() {
+    public TeamList(MainBaseballFrame base) {
         initComponents();
+        
+        createTeamButton.addActionListener(new ActionListener() {
+            
+            public void actionPerformed(ActionEvent evt) {
+                base.switchPanel(base, new CreateTeam());
+            }
+    });
         
         /* Code to populate the table using userteam data */
         
