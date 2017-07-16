@@ -4,6 +4,10 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.ImageIcon;
 /**
  *
@@ -123,10 +127,62 @@ public class CreateTeam extends javax.swing.JPanel {
     }//GEN-LAST:event_tfSalaryActionPerformed
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        // TODO add your handling code here:
+        
+         //Retrieve the text field values
+         String teamName = tfName.getText();
+         if (teamName == null || teamName.isEmpty()) {
+             teamName = "unknown";
+         }
+         
+         long salaryCap;
+         try {
+             salaryCap = Long.parseLong(tfSalary.getText());
+             if (salaryCap == 0) {
+                 salaryCap = Long.MAX_VALUE;
+             }
+         } catch (NumberFormatException ex) {
+             salaryCap = Long.MAX_VALUE;
+         }
+         
+         //Retrieve the user's login information
+         String user = MainBaseballFrame.getSessionUser();
+         String password = MainBaseballFrame.getSessionPassword();
+         
+         //Add the team to the userteams table of the baseball database
+         addTeamToDatabase(teamName, salaryCap, user, password);
+         
+         //Switch to the Player Search menu
+         
     }//GEN-LAST:event_createButtonActionPerformed
-
-
+    /* Utility method to place new team in the userteams table */
+    private void addTeamToDatabase(String name, long sal, String user, String pass) {
+        
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        int ret;
+        try {
+          stmt = conn.createStatement();
+          ret = stmt.executeUpdate("INSERT INTO userteams (salaryCap, name, login, password) "
+                             + " VALUES( " + sal + ", '" + name + "', '" 
+                             + user + "', '" + pass + "');");
+          if (ret != 1) {
+              System.err.println("Failed to add team! Database problem...");
+              System.exit(1);
+          }    
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        finally {
+           try {
+           conn.close();
+           if (stmt != null) { stmt.close(); }
+           } catch (SQLException e) {
+               //TODO add clean up
+               BaseballUtilities.printSQLException(e);
+           }
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createButton;
     private javax.swing.JLabel jLabel1;
