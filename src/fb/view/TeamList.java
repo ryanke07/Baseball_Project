@@ -24,11 +24,13 @@ public class TeamList extends javax.swing.JPanel {
     String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     String file = "baseballpic.jpg";
+    MainBaseballFrame base;
     /**
      * Creates new form TeamList
      */
     public TeamList(MainBaseballFrame base) {
         initComponents();
+        this.base = base;
         
         createTeamButton.addActionListener(new ActionListener() {
             
@@ -130,6 +132,11 @@ public class TeamList extends javax.swing.JPanel {
         jLabel2.setPreferredSize(new java.awt.Dimension(77, 63));
 
         selectTeamButton.setText("Select team.");
+        selectTeamButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectTeamButtonActionPerformed(evt);
+            }
+        });
 
         createTeamButton.setText("Create new team.");
 
@@ -153,6 +160,7 @@ public class TeamList extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -182,6 +190,16 @@ public class TeamList extends javax.swing.JPanel {
                 .addGap(0, 18, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void selectTeamButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectTeamButtonActionPerformed
+        //Figure out what the teamID is for the selected row
+        int selectedRow = teamsTable.getSelectedRow();
+        int teamID = (Integer) teamsTable.getValueAt(selectedRow, 0);
+        int salaryCap = (Integer) teamsTable.getValueAt(selectedRow, 1);
+        String name = (String) teamsTable.getValueAt(selectedRow, 2);
+        //Construct a new Team Display pane and add it to the main frame
+        base.switchPanel(base, new TeamDisplay(base, teamID, salaryCap, name));
+    }//GEN-LAST:event_selectTeamButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
