@@ -7,7 +7,14 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Vector;
 import javax.swing.ImageIcon;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -26,6 +33,67 @@ public class TeamDisplay extends javax.swing.JPanel {
         this.base = base;
         lbName.setText(name);
         lbSalary.setText("$" + sal);
+        
+        //Populate the display table with any player belonging to this team
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+          stmt = conn.createStatement();
+          rs = stmt.executeQuery("select P.nameFirst AS First, P.nameLast AS Last,"
+                                  + " P.debut AS Debut, P.finalGame AS MostRecentGame "
+                                  + "from on_user_team U, player P " 
+                                  + "where U.playerID = P.playerID AND "
+                                  + "U.teamID = " + teamID + ";");
+          
+          populatePlayersTable(rs);
+          
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        finally {
+           try {
+           conn.close();
+           if (stmt != null) { stmt.close(); }
+           if (rs != null) { rs.close(); }
+           } catch (SQLException e) {
+               //TODO add clean up
+               BaseballUtilities.printSQLException(e);
+           }
+            
+        }
+    }
+    
+    private void populatePlayersTable(ResultSet rs) {
+        try {
+            ResultSetMetaData meta = rs.getMetaData();
+            
+            //Table Header
+            Vector<String> cols = new Vector<String>();
+            int numCols = meta.getColumnCount();
+            //numbering starts from 1!
+            for (int currCol = 1; currCol <= numCols; currCol++) {
+                cols.add(meta.getColumnName(currCol));
+            }
+            
+            //Table Body
+            Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+            while (rs.next()) {
+                Vector<Object> holder = new Vector<Object>();
+                for (int currCol = 1; currCol <= numCols; currCol++) {
+                    holder.add(rs.getObject(currCol));
+                }
+                data.add(holder);
+            }
+            
+            tblPlayers.setModel(new DefaultTableModel(data, cols));
+           // tblPlayers.fireTableDataChanged();
+            
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
     }
 
     /**

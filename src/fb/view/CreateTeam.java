@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 /**
  *
  * @author dianeyanke
@@ -17,11 +18,13 @@ public class CreateTeam extends javax.swing.JPanel {
     String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     String file = "baseballpic.jpg";
+    MainBaseballFrame base;
     /**
      * Creates new form CreateTeam
      */
-    public CreateTeam() {
+    public CreateTeam(MainBaseballFrame base) {
         initComponents();
+        this.base = base;
     }
 
     /**
@@ -151,6 +154,11 @@ public class CreateTeam extends javax.swing.JPanel {
          //Add the team to the userteams table of the baseball database
          addTeamToDatabase(teamName, salaryCap, user, password);
          
+         //TODO: The timing may be off here.  The panel may switch before the user
+         //clicks "Ok" on the dialog.  That may not be a big deal, though.
+         
+         //Indicate success to the user
+         JOptionPane.showMessageDialog(base, "Success!");
          //Switch to the Player Search menu
          
     }//GEN-LAST:event_createButtonActionPerformed
