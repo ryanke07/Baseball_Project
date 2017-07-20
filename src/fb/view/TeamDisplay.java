@@ -21,16 +21,19 @@ import javax.swing.table.DefaultTableModel;
  * @author dianeyanke
  */
 public class TeamDisplay extends javax.swing.JPanel {
-    String path =
+    private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
-    String file = "baseballpic.jpg";
-    MainBaseballFrame base;
+    private final String file = "baseballpic.jpg";
+    private MainBaseballFrame base;
+    private int teamID;
+    
     /**
      * Creates new form TeamDisplay
      */
     public TeamDisplay(MainBaseballFrame base, int teamID, int sal, String name) {
         initComponents();
         this.base = base;
+        this.teamID = teamID;
         lbName.setText(name);
         lbSalary.setText("$" + sal);
         
@@ -40,8 +43,8 @@ public class TeamDisplay extends javax.swing.JPanel {
         ResultSet rs = null;
         try {
           stmt = conn.createStatement();
-          rs = stmt.executeQuery("select P.nameFirst AS First, P.nameLast AS Last,"
-                                  + " P.debut AS Debut, P.finalGame AS MostRecentGame "
+          rs = stmt.executeQuery("select P.playerID, P.nameFirst, P.nameLast,"
+                                  + " P.debut, P.finalGame "
                                   + "from on_user_team U, player P " 
                                   + "where U.playerID = P.playerID AND "
                                   + "U.teamID = " + teamID + ";");
@@ -146,6 +149,11 @@ public class TeamDisplay extends javax.swing.JPanel {
         btReview.setText("Review Player.");
 
         btDelete.setText("Delete Player.");
+        btDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btDeleteActionPerformed(evt);
+            }
+        });
 
         btAdd.setText("Add Player.");
 
@@ -197,6 +205,47 @@ public class TeamDisplay extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeleteActionPerformed
+        // Remove the selected player from the on_user_team table
+        int selectedRow = tblPlayers.getSelectedRow();
+        String playerID = (String) tblPlayers.getValueAt(selectedRow, 0);
+        String deleteQuery = "DELETE FROM on_user_team WHERE playerID = '" + playerID + "';";
+        
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+          stmt = conn.createStatement();
+          int ret = stmt.executeUpdate(deleteQuery);
+          
+          //Do we want to print a message indicating failure?
+          
+          //Repopulate
+          rs = stmt.executeQuery("select P.playerID, P.nameFirst, P.nameLast,"
+                                  + " P.debut, P.finalGame "
+                                  + "from on_user_team U, player P " 
+                                  + "where U.playerID = P.playerID AND "
+                                  + "U.teamID = " + teamID + ";");
+          populatePlayersTable(rs);
+          
+          //Redraw
+          ((DefaultTableModel)tblPlayers.getModel()).fireTableDataChanged();
+        
+        } catch (SQLException e) {
+          BaseballUtilities.printSQLException(e);
+        }
+        finally {
+            try {
+              if (conn != null) { conn.close(); }
+              if (stmt != null) { stmt.close(); }
+              if (rs != null) {rs.close(); }
+            } catch (SQLException e) {
+              BaseballUtilities.printSQLException(e);
+            }
+        }
+        
+    }//GEN-LAST:event_btDeleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
