@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -271,6 +272,18 @@ public class PitcherSearch extends javax.swing.JPanel {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // Implement the search query
+        // Does the user want to only view career statistics?
+        Object[] options = {"Yes", "No"};
+        //Yes = 0, No = 1
+        int n = JOptionPane.showOptionDialog(base, 
+                       "Career statistics only (click no to show individual season statistics) ?",
+                       "Career statistics?",
+                       JOptionPane.YES_NO_OPTION,
+                       JOptionPane.QUESTION_MESSAGE,
+                       null,
+                       options,
+                       options[1]);
+        
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
