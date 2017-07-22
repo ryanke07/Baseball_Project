@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -156,6 +157,11 @@ public class TeamDisplay extends javax.swing.JPanel {
         });
 
         btAdd.setText("Add Player.");
+        btAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAddActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -246,6 +252,24 @@ public class TeamDisplay extends javax.swing.JPanel {
         }
         
     }//GEN-LAST:event_btDeleteActionPerformed
+
+    private void btAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAddActionPerformed
+        //Does the user want to add a pitcher or a positional player?
+        Object[] options = {"Cancel", "Positional Player", "Pitcher"};
+        int n = JOptionPane.showOptionDialog(base, 
+                       "What kind of player would you like to add?",
+                       "What Kind of Player?",
+                       JOptionPane.YES_NO_CANCEL_OPTION,
+                       JOptionPane.QUESTION_MESSAGE,
+                       null,
+                       options,
+                       options[2]);
+        //n = 2 is pitcher, n = 1 is positional, n = 0 is cancel
+        if (n == 2) {
+            //Do they have room on the team for a pitcher?
+            boolean roomEnough = BaseballUtilities.checkRoster(teamID, 2);
+        }
+    }//GEN-LAST:event_btAddActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
