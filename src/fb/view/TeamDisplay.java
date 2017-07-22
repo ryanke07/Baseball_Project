@@ -272,6 +272,7 @@ public class TeamDisplay extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(base, 
                         "You cannot have more than six pitchers per roster.");
             }
+            base.switchPanel(base, new PitcherSearch(base, this));
         } else if (n == 1) {
             //Do they have room on the team for a positional player?
             boolean roomEnough = BaseballUtilities.checkRoster(teamID, 1);
@@ -279,6 +280,8 @@ public class TeamDisplay extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(base, 
                         "You cannot have more than nine positional players per roster.");
             }
+        } else { 
+            //do nothing - cancel option
         }
     }//GEN-LAST:event_btAddActionPerformed
 
