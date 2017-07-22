@@ -99,30 +99,43 @@ public class BaseballUtilities {
     * @ret: true for a passed test */
     public static boolean checkRoster(int teamID, int type) {
         
-        //We will only check for pitchers at this point
-        //Room for improvement: check entire roster to facilitate team comparisons
-        if (type != 2) { return true; }
-        
         Connection conn = ConnectionSupplier.getMyConnection();
         Statement stmt = null;
         ResultSet rs = null;
         
         try {
-            String query = "SELECT count(distinct U1.playerID) " + 
+            String query = null;
+        
+            if (type == 2) {
+                query = "SELECT count(distinct U1.playerID) " + 
                            "FROM on_user_team U1, fielding F1 " + 
                            "WHERE U1.playerID = F1.playerID AND " +
                            "U1.teamID = " + teamID + " AND " +
+                           "F1.position = 'P' AND " +
                            "NOT EXISTS (SELECT * FROM on_user_team U2, fielding F2 " +
                            "WHERE U2.playerID = F2.playerID AND " +
                            "U2.teamID = " + teamID + " AND U2.playerID = U1.playerID " +
                            "AND F2.position <> 'P');";
+            } else {
+                query = "SELECT count(distinct U1.playerID) " + 
+                           "FROM on_user_team U1, fielding F1 " + 
+                           "WHERE U1.playerID = F1.playerID AND " +
+                           "U1.teamID = " + teamID + " AND " +
+                           "F1.position <> 'P' AND " +
+                           "NOT EXISTS (SELECT * FROM on_user_team U2, fielding F2 " +
+                           "WHERE U2.playerID = F2.playerID AND " +
+                           "U2.teamID = " + teamID + " AND U2.playerID = U1.playerID " +
+                           "AND F2.position = 'P');";  
+            }
             stmt = conn.createStatement();
             rs = stmt.executeQuery(query);
             rs.first();
-            int numPitchers = rs.getInt(1);
+            int num = rs.getInt(1);
            
             //Too many pitchers!
-            if (numPitchers > 6) { return false; }
+            if (type == 2 && num > 6) { return false; }
+            //Too many positional players!
+            else if (num > 9) { return false; }
             
         } catch (SQLException e) {
             printSQLException(e);
