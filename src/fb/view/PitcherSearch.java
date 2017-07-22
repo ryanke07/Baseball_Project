@@ -11,6 +11,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -22,7 +23,8 @@ public class PitcherSearch extends javax.swing.JPanel {
     private final String file = "baseballpic.jpg";
     private MainBaseballFrame base;
     private TeamDisplay caller;
-    private String[] comparisonOperators = { "<", "<=", "=", ">=", ">" };
+    private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
+    private static final int CAREER_ONLY_SEARCH = 0;
     /**
      * Creates new form PitcherSearch
      */
@@ -275,7 +277,7 @@ public class PitcherSearch extends javax.swing.JPanel {
         // Does the user want to only view career statistics?
         Object[] options = {"Yes", "No"};
         //Yes = 0, No = 1
-        int n = JOptionPane.showOptionDialog(base, 
+        int optionChosen = JOptionPane.showOptionDialog(base, 
                        "Career statistics only (click no to show individual season statistics) ?",
                        "Career statistics?",
                        JOptionPane.YES_NO_OPTION,
@@ -283,14 +285,94 @@ public class PitcherSearch extends javax.swing.JPanel {
                        null,
                        options,
                        options[1]);
+        //Obtain the comparison operators selected by the user
+        String[] comparisons = new String[8];
+        comparisons[0] = (String) cbWins.getSelectedItem(); //wins
+        comparisons[1] = (String) cbLosses.getSelectedItem(); //losses
+        comparisons[2] = (String) cbSaves.getSelectedItem(); //saves
+        comparisons[3] = (String) cbWalks.getSelectedItem(); //walks
+        comparisons[4] = (String) cbStrikeouts.getSelectedItem(); //strikeouts
+        comparisons[5] = (String) cbERA.getSelectedItem(); //e.r.a.
+        comparisons[6] = (String) cbErrors.getSelectedItem(); //errors
+        comparisons[7] = (String) cbGames.getSelectedItem(); //games
+        //Obtain the parameters of the query from the text fields
+        Object[] parameters = new Object[8];
+        parameters[0] = (Object) tfWins.getText(); //wins
+        parameters[1] = (Object) tfLosses.getText(); //losses
+        parameters[2] = (Object) tfSaves.getText(); //saves
+        parameters[3] = (Object) tfWalks.getText(); //walks
+        parameters[4] = (Object) tfStrikeouts.getText(); //strikeouts
+        parameters[5] = (Object) tfERA.getText(); //e.r.a.
+        parameters[6] = (Object) tfErrors.getText(); //errors
+        parameters[7] = (Object) tfGames.getText(); //games
         
+        validateInputOrSetDefault(parameters, comparisons);
+        
+        DefaultTableModel dtm = runQueryAndPopulateDTM(comparisons, parameters, optionChosen);
     }//GEN-LAST:event_btnSearchActionPerformed
 
+    /*
+    * Method to run a query based on user's search criteria.
+    *
+    * @arg comps : an array of comparison operators in String format
+    * @arg params : an array of seven Integer values and one Double value giving query comparison values
+    * @arg careerOnly: a flag (yes = 0, no = 1) determining whether we average the statistics 
+    *
+    * @ret DefaultTableModel: a table model that's populated using the ResultSet returned by the query
+    */
+    private DefaultTableModel runQueryAndPopulateDTM(String[] comps, Object[] params, int careerOnly) {
+        
+        DefaultTableModel tableModelReturned = null;
+        
+        //If the statistics should be averaged across a career, follow this path.
+        if (careerOnly == CAREER_ONLY_SEARCH) {
+            
+        } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
+        else {
+            
+        }
+        
+        return tableModelReturned;
+    }
+    
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // Return to Team List
         base.switchPanel(base, caller);  
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void validateInputOrSetDefault(Object[] p, String[] c) {
+        for (int i = 0; i < 8; i++) {
+            if (i == 5) {  //special case: ERA
+                if (c[5] == "none") { 
+                  p[5] = (Double) 0.0; 
+                  c[5] = " >= "; 
+                } else {
+                    try {
+                        p[5] = Double.parseDouble((String)p[5]);
+                    //set a default comparison if they screw up the text entry
+                    } catch (NumberFormatException e) {
+                        p[5] = (Double) 0.0; 
+                        c[5] = " >= ";
+                    }
+                }
+            }
+            else {
+                if (c[i] == "none") { 
+                  p[i] = (Integer) 0; 
+                  c[i] = " >= "; 
+                } else {
+                    try {
+                        p[i] = Integer.parseInt((String)p[i]);
+                    //set a default comparison if they screw up the text entry
+                    } catch (NumberFormatException e) {
+                        p[i] = (Integer) 0; 
+                        c[i] = " >= ";
+                    }
+                }
+            }
+        }
+    }
+    
     private void populateComboBoxes() {
         
         DefaultComboBoxModel dcbm1 = new DefaultComboBoxModel(comparisonOperators);
