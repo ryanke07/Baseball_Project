@@ -268,6 +268,10 @@ public class TeamDisplay extends javax.swing.JPanel {
         if (n == 2) {
             //Do they have room on the team for a pitcher?
             boolean roomEnough = BaseballUtilities.checkRoster(teamID, 2);
+            if (!roomEnough) {
+                JOptionPane.showMessageDialog(base, 
+                        "You cannot have more than six pitchers per roster");
+            }
         }
     }//GEN-LAST:event_btAddActionPerformed
 
