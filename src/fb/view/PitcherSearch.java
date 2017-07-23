@@ -18,15 +18,18 @@ import javax.swing.table.DefaultTableModel;
  * @author dianeyanke
  */
 public class PitcherSearch extends javax.swing.JPanel {
+    //some constants
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
+    private static final int CAREER_ONLY_SEARCH = 0;
+    private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
+    //some instance fields
     private MainBaseballFrame base;
     private TeamDisplay caller;
-    private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
     private int teamID;
    
-    private static final int CAREER_ONLY_SEARCH = 0;
+    
     /**
      * Creates new form PitcherSearch
      */
@@ -386,18 +389,18 @@ public class PitcherSearch extends javax.swing.JPanel {
         
         cbERA.setModel(dcbm1);
         cbErrors.setModel(dcbm2);
-        cbLosses.setModel(dcbm3);;
-        cbSaves.setModel(dcbm4);;
-        cbStrikeouts.setModel(dcbm5);;
-        cbWalks.setModel(dcbm6);;
+        cbLosses.setModel(dcbm3);
+        cbSaves.setModel(dcbm4);
+        cbStrikeouts.setModel(dcbm5);
+        cbWalks.setModel(dcbm6);
         cbWins.setModel(dcbm7);
         cbGames.setModel(dcbm8);
         //set to "=" be default
         cbERA.setSelectedIndex(2);
         cbErrors.setSelectedIndex(2);
-        cbLosses.setSelectedIndex(2);;
-        cbSaves.setSelectedIndex(2);;
-        cbStrikeouts.setSelectedIndex(2);;
+        cbLosses.setSelectedIndex(2);
+        cbSaves.setSelectedIndex(2);
+        cbStrikeouts.setSelectedIndex(2);
         cbWalks.setSelectedIndex(2);
         cbWins.setSelectedIndex(2);
         cbGames.setSelectedIndex(2);

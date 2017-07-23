@@ -199,7 +199,7 @@ public class TeamList extends javax.swing.JPanel {
         int salaryCap = (Integer) teamsTable.getValueAt(selectedRow, 1);
         String name = (String) teamsTable.getValueAt(selectedRow, 2);
         //Construct a new Team Display pane and add it to the main frame
-        base.switchPanel(base, new TeamDisplay(base, teamID, salaryCap, name));
+        base.switchPanel(base, new TeamDisplay(base, this, teamID, salaryCap, name));
     }//GEN-LAST:event_selectTeamButtonActionPerformed
 
 

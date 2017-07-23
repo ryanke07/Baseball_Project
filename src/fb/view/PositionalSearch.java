@@ -7,16 +7,24 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author dianeyanke
  */
 public class PositionalSearch extends javax.swing.JPanel {
+    //Some constant values
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
+    private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
+    private String[] positions = { "C", "1B", "2B", "3B", "OF", "SS", "ALL" };
+    private static final int CAREER_ONLY_SEARCH = 0;
+    //Some instance fields
     private MainBaseballFrame base;
     private TeamDisplay caller;
     private int teamID;
@@ -28,6 +36,8 @@ public class PositionalSearch extends javax.swing.JPanel {
         this.base = base;
         this.caller = caller;
         this.teamID = teamID;
+        
+        populateComboBoxes();
     }
 
     /**
@@ -53,7 +63,7 @@ public class PositionalSearch extends javax.swing.JPanel {
         cbAtBats = new javax.swing.JComboBox<>();
         cbHits = new javax.swing.JComboBox<>();
         cbHomeRuns = new javax.swing.JComboBox<>();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cbRBI = new javax.swing.JComboBox<>();
         cbWalks = new javax.swing.JComboBox<>();
         cbStrikeouts = new javax.swing.JComboBox<>();
         cbErrors = new javax.swing.JComboBox<>();
@@ -100,7 +110,7 @@ public class PositionalSearch extends javax.swing.JPanel {
 
         cbHomeRuns.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbRBI.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         cbWalks.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -161,7 +171,7 @@ public class PositionalSearch extends javax.swing.JPanel {
                                 .addComponent(tfHomeRuns, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbRBI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tfRBI, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
@@ -241,17 +251,18 @@ public class PositionalSearch extends javax.swing.JPanel {
                     .addComponent(cbHits, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tfHits, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(cbHomeRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfHomeRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(cbHomeRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfHomeRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbRBI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(tfRBI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -290,7 +301,116 @@ public class PositionalSearch extends javax.swing.JPanel {
 
     private void btSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSearchActionPerformed
         // Implement the query and construct a Results panel to display results
+       
+        // Does the user want to only view career statistics?
+        Object[] options = {"Yes", "No"};
+        //Yes = 0, No = 1
+        int optionChosen = JOptionPane.showOptionDialog(base, 
+                       "Career statistics only (click no to show individual season statistics) ?",
+                       "Career statistics?",
+                       JOptionPane.YES_NO_OPTION,
+                       JOptionPane.QUESTION_MESSAGE,
+                       null,
+                       options,
+                       options[1]);
+        //Obtain the comparison operators selected by the user
+        String[] comparisons = new String[9];
+        comparisons[0] = (String) cbAtBats.getSelectedItem(); //wins
+        comparisons[1] = (String) cbHits.getSelectedItem(); //losses
+        comparisons[2] = (String) cbHomeRuns.getSelectedItem(); //saves
+        comparisons[3] = (String) cbRBI.getSelectedItem(); //walks
+        comparisons[4] = (String) cbWalks.getSelectedItem(); //strikeouts
+        comparisons[5] = (String) cbStrikeouts.getSelectedItem(); //e.r.a.
+        comparisons[6] = (String) cbErrors.getSelectedItem(); //errors
+        comparisons[7] = (String) cbGames.getSelectedItem(); //games
+        //The "ALL" option will have to be handled in a special way
+        comparisons[8] = " = ";
+        //Obtain the parameters of the query from the text fields
+        Object[] parameters = new Object[9];
+        parameters[0] = (Object) tfAtBats.getText(); //wins
+        parameters[1] = (Object) tfHits.getText(); //losses
+        parameters[2] = (Object) tfHomeRuns.getText(); //saves
+        parameters[3] = (Object) tfRBI.getText(); //walks
+        parameters[4] = (Object) tfWalks.getText(); //strikeouts
+        parameters[5] = (Object) tfStrikeouts.getText(); //e.r.a.
+        parameters[6] = (Object) tfErrors.getText(); //errors
+        parameters[7] = (Object) tfGames.getText(); //games
+        parameters[8] = (String) cbPosition.getSelectedItem();
+        
+        validateInputOrSetDefault(parameters, comparisons);
+        
+        DefaultTableModel dtm = runQueryAndPopulateDTM(comparisons, parameters, optionChosen);
     }//GEN-LAST:event_btSearchActionPerformed
+   
+    private DefaultTableModel runQueryAndPopulateDTM(String[] comps, Object[] params, int careerOnly) {
+        
+        DefaultTableModel tableModelReturned = null;
+        
+        //If the statistics should be averaged across a career, follow this path.
+        if (careerOnly == CAREER_ONLY_SEARCH) {
+            
+        } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
+        else {
+            
+        }
+        
+        return tableModelReturned;
+    }
+    
+    private void populateComboBoxes() {
+        
+        DefaultComboBoxModel dcbm1 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm2 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm3 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm4 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm5 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm6 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm7 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm8 = new DefaultComboBoxModel(comparisonOperators);
+        DefaultComboBoxModel dcbm9 = new DefaultComboBoxModel(positions);
+        
+        cbAtBats.setModel(dcbm1);
+        cbHits.setModel(dcbm2);
+        cbHomeRuns.setModel(dcbm3);
+        cbRBI.setModel(dcbm4);
+        cbWalks.setModel(dcbm5);
+        cbStrikeouts.setModel(dcbm6);
+        cbErrors.setModel(dcbm7);
+        cbGames.setModel(dcbm8);
+        cbPosition.setModel(dcbm9);
+        //set to "=" be default
+        cbAtBats.setSelectedIndex(2);
+        cbHits.setSelectedIndex(2);
+        cbHomeRuns.setSelectedIndex(2);
+        cbRBI.setSelectedIndex(2);
+        cbWalks.setSelectedIndex(2);
+        cbStrikeouts.setSelectedIndex(2);
+        cbErrors.setSelectedIndex(2);
+        cbGames.setSelectedIndex(2);
+        
+        //We will assume initially that users select either a specific position
+        //+ or every position.  A later improvement would be to allow for subset
+        //+ selections.
+        cbPosition.setSelectedIndex(6);
+    }
+    
+    private void validateInputOrSetDefault(Object[] p, String[] c) {
+        for (int i = 0; i < 8; i++) {
+            if (c[i] == "none") {
+                p[i] = (Integer) 0;
+                c[i] = " >= ";
+            } else {
+                try {
+                    p[i] = Integer.parseInt((String) p[i]);
+                    //set a default comparison if they screw up the text entry
+                } catch (NumberFormatException e) {
+                    p[i] = (Integer) 0;
+                    c[i] = " >= ";
+                }
+            }
+        }
+    }
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -302,9 +422,9 @@ public class PositionalSearch extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cbHits;
     private javax.swing.JComboBox<String> cbHomeRuns;
     private javax.swing.JComboBox<String> cbPosition;
+    private javax.swing.JComboBox<String> cbRBI;
     private javax.swing.JComboBox<String> cbStrikeouts;
     private javax.swing.JComboBox<String> cbWalks;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
