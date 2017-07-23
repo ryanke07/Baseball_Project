@@ -376,17 +376,17 @@ public class PositionalSearch extends javax.swing.JPanel {
                        "B.rbi" + comps[3] + params[3] + " AND " +
                        "B.baseOnBalls" + comps[4] + params[4] + " AND " +
                        "B.strikeouts" + comps[5] + params[5] + " " + 
-                       "INTERSECT " + 
-                       "SELECT DISTINCT P2.playerID, P2.nameFirst, P2.nameLast " + 
+                       "AND P.playerID IN (" + 
+                       "SELECT DISTINCT P2.playerID " + 
                        "FROM player P2, " +
-                       "(SELECT playerID, yearID, SUM(errors) AS errors, SUM(games) AS games ";
+                       "(SELECT playerID, yearID, SUM(errors) AS errors, SUM(games) AS games FROM fielding ";
                        if (params[8] != "ALL") {
-                           query = query + "WHERE position = " + params[8] + " ";
+                           query = query + "WHERE position = '" + params[8] + "' ";
                        }
                        query = query + "GROUP BY yearID, playerID) AS F " +
                                "WHERE F.playerID = P2.playerID AND " +
                                "F.errors " + comps[6] + params[6] + " AND " +
-                               "F.games " + comps[7] + params[7] + ";";
+                               "F.games " + comps[7] + params[7] + ");";
                        
                     System.out.println(query);
                     
