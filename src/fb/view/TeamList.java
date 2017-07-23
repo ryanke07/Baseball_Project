@@ -194,6 +194,7 @@ public class TeamList extends javax.swing.JPanel {
     private void selectTeamButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectTeamButtonActionPerformed
         //Figure out what the teamID is for the selected row
         int selectedRow = teamsTable.getSelectedRow();
+        if (selectedRow < 0) return;
         int teamID = (Integer) teamsTable.getValueAt(selectedRow, 0);
         int salaryCap = (Integer) teamsTable.getValueAt(selectedRow, 1);
         String name = (String) teamsTable.getValueAt(selectedRow, 2);
