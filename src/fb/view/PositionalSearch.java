@@ -7,6 +7,10 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -346,13 +350,77 @@ public class PositionalSearch extends javax.swing.JPanel {
         
         DefaultTableModel tableModelReturned = null;
         
-        //If the statistics should be averaged across a career, follow this path.
-        if (careerOnly == CAREER_ONLY_SEARCH) {
-            
-        } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
-        else {
-            
+        //Make sure you can get the Connection first
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+      
+        try {
+            String query = null;
+            //If the statistics should be averaged across a career, follow this path.
+            if (careerOnly == CAREER_ONLY_SEARCH) {
+
+            } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
+            else {
+               query = "SELECT DISTINCT P.playerID, P.nameFirst, P.nameLast " +
+                       "FROM player P, " + 
+                       "(SELECT playerID, yearID, SUM(atBats) AS atBats, SUM(hits) AS hits, " +
+                       "SUM(homeRuns) AS homeRuns, SUM(rbi) AS rbi, SUM(baseOnBalls) AS baseOnBalls, " +
+                       "SUM(strikeouts) AS strikeouts " +
+                       "FROM batting " +
+                       "GROUP BY yearID, playerID) AS B " +
+                       "WHERE P.playerID = B.playerID AND " +
+                       "B.atBats" + comps[0] + params[0] + " AND " +
+                       "B.hits" + comps[1] + params[1] + " AND " +
+                       "B.homeRuns" + comps[2] + params[2] + " AND " +
+                       "B.rbi" + comps[3] + params[3] + " AND " +
+                       "B.baseOnBalls" + comps[4] + params[4] + " AND " +
+                       "B.strikeouts" + comps[5] + params[5] + " " + 
+                       "INTERSECT " + 
+                       "SELECT DISTINCT P2.playerID, P2.nameFirst, P2.nameLast " + 
+                       "FROM player P2, " +
+                       "(SELECT playerID, yearID, SUM(errors) AS errors, SUM(games) AS games ";
+                       if (params[8] != "ALL") {
+                           query = query + "WHERE position = " + params[8] + " ";
+                       }
+                       query = query + "GROUP BY yearID, playerID) AS F " +
+                               "WHERE F.playerID = P2.playerID AND " +
+                               "F.errors " + comps[6] + params[6] + " AND " +
+                               "F.games " + comps[7] + params[7] + ";";
+                       
+                    System.out.println(query);
+                    
+                    stmt = conn.createStatement();
+                    rs = stmt.executeQuery(query);
+                    
+                    //Test
+                    while (rs.next()) {
+                        String firstName = rs.getString(1);
+                        String lastName = rs.getString(2);
+                        System.out.println(firstName + " " + lastName);
+                    }
+                              
+                       
+            }
+
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+            try {
+                conn.close();
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                //TODO add clean up
+                BaseballUtilities.printSQLException(e);
+            }
         }
+        
+       
         
         return tableModelReturned;
     }
