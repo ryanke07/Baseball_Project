@@ -9,8 +9,10 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -344,6 +346,13 @@ public class PositionalSearch extends javax.swing.JPanel {
         validateInputOrSetDefault(parameters, comparisons);
         
         DefaultTableModel dtm = runQueryAndPopulateDTM(comparisons, parameters, optionChosen);
+        
+        if (dtm != null) {
+            //display the results in a new Results panel
+            base.switchPanel(base, new Results(base, caller, this, dtm));
+        }
+        
+        
     }//GEN-LAST:event_btSearchActionPerformed
    
     private DefaultTableModel runQueryAndPopulateDTM(String[] comps, Object[] params, int careerOnly) {
@@ -388,19 +397,11 @@ public class PositionalSearch extends javax.swing.JPanel {
                                "F.errors " + comps[6] + params[6] + " AND " +
                                "F.games " + comps[7] + params[7] + ");";
                        
-                    System.out.println(query);
                     
                     stmt = conn.createStatement();
                     rs = stmt.executeQuery(query);
-                    
-                    //Test
-                    while (rs.next()) {
-                        String firstName = rs.getString(1);
-                        String lastName = rs.getString(2);
-                        System.out.println(firstName + " " + lastName);
-                    }
-                              
-                       
+                    tableModelReturned = populateTableModel(rs);
+              
             }
 
         } catch (SQLException e) {
@@ -423,6 +424,39 @@ public class PositionalSearch extends javax.swing.JPanel {
        
         
         return tableModelReturned;
+    }
+    
+     private DefaultTableModel populateTableModel(ResultSet rs) {
+        
+        try {
+            ResultSetMetaData meta = rs.getMetaData();
+            
+            //Table Header
+            Vector<String> cols = new Vector<String>();
+            int numCols = meta.getColumnCount();
+            //numbering starts from 1!
+            for (int currCol = 1; currCol <= numCols; currCol++) {
+                cols.add(meta.getColumnName(currCol));
+            }
+            
+            //Table Body
+            Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+            while (rs.next()) {
+                Vector<Object> holder = new Vector<Object>();
+                for (int currCol = 1; currCol <= numCols; currCol++) {
+                    holder.add(rs.getObject(currCol));
+                }
+                data.add(holder);
+            }
+            
+            return new DefaultTableModel(data, cols);
+           // teamsTable.fireTableDataChanged();
+            
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        return null;
     }
     
     private void populateComboBoxes() {

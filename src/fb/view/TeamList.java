@@ -35,7 +35,7 @@ public class TeamList extends javax.swing.JPanel {
         createTeamButton.addActionListener(new ActionListener() {
             
             public void actionPerformed(ActionEvent evt) {
-                base.switchPanel(base, new CreateTeam(base));
+                base.switchPanel(base, new CreateTeam(base, TeamList.this));
             }
     });
         

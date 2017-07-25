@@ -19,12 +19,14 @@ public class CreateTeam extends javax.swing.JPanel {
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     String file = "baseballpic.jpg";
     MainBaseballFrame base;
+    TeamList caller;
     /**
      * Creates new form CreateTeam
      */
-    public CreateTeam(MainBaseballFrame base) {
+    public CreateTeam(MainBaseballFrame base, TeamList caller) {
         initComponents();
         this.base = base;
+        this.caller = caller;
     }
 
     /**
@@ -159,7 +161,8 @@ public class CreateTeam extends javax.swing.JPanel {
          
          //Indicate success to the user
          JOptionPane.showMessageDialog(base, "Success!");
-         //Switch to the Player Search menu
+         //Switch to the Team List menu
+         base.switchPanel(base, new TeamList(base));
          
     }//GEN-LAST:event_createButtonActionPerformed
     /* Utility method to place new team in the userteams table */
