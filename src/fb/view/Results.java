@@ -7,6 +7,10 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -19,19 +23,21 @@ public class Results extends javax.swing.JPanel {
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
-    MainBaseballFrame base;
-    TeamDisplay ancestor;
-    PositionalSearch caller;
+    private MainBaseballFrame base;
+    private TeamDisplay ancestor;
+    private PositionalSearch caller;
+    private int teamID;
     /**
      * Creates new form Results
      */
     public Results(MainBaseballFrame base, TeamDisplay ancestor, PositionalSearch caller,
-                    DefaultTableModel model) {
+                    DefaultTableModel model, int teamID) {
         initComponents();
         this.base = base;
         this.ancestor = ancestor;
         this.caller = caller;
         tblResults.setModel(model);
+        this.teamID = teamID;
     }
 
     /**
@@ -47,7 +53,7 @@ public class Results extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblResults = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        btAdd = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -69,8 +75,12 @@ public class Results extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tblResults);
 
-        jButton1.setText("Add Player.");
-        jButton1.setActionCommand("Add Player.");
+        btAdd.setText("Add Player.");
+        btAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAddActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Review Player.");
 
@@ -99,7 +109,7 @@ public class Results extends javax.swing.JPanel {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
-                                .addComponent(jButton1)
+                                .addComponent(btAdd)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -118,7 +128,7 @@ public class Results extends javax.swing.JPanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(btAdd)
                     .addComponent(jButton2)
                     .addComponent(btnCancel))
                 .addContainerGap())
@@ -129,10 +139,43 @@ public class Results extends javax.swing.JPanel {
         base.switchPanel(base, caller);
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void btAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAddActionPerformed
+        // Add the selected player to the user's team
+         int selectedRow = tblResults.getSelectedRow();
+        String playerID = (String) tblResults.getValueAt(selectedRow, 0);
+        String query = "INSERT INTO on_user_team VALUES(" + teamID + ", '" + playerID + "');";
+        
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+          stmt = conn.createStatement();
+          int ret = stmt.executeUpdate(query);
+          
+          //Do we want to print a message indicating failure?
+
+        } catch (SQLException e) {
+          BaseballUtilities.printSQLException(e);
+        }
+        finally {
+            try {
+              if (conn != null) { conn.close(); }
+              if (stmt != null) { stmt.close(); }
+              if (rs != null) {rs.close(); }
+            } catch (SQLException e) {
+              BaseballUtilities.printSQLException(e);
+            }
+        }
+        //Return to the Team Display
+        base.switchPanel(base, new TeamDisplay(base, ancestor.getTeamList(),
+                                                ancestor.getTeamID(), ancestor.getSalary(),
+                                                ancestor.getName()));
+    }//GEN-LAST:event_btAddActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btAdd;
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

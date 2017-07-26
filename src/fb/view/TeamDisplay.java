@@ -15,6 +15,7 @@ import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -28,6 +29,8 @@ public class TeamDisplay extends javax.swing.JPanel {
     private MainBaseballFrame base;
     private TeamList caller;
     private int teamID;
+    private int salary;
+    private String name;
     
     /**
      * Creates new form TeamDisplay
@@ -37,7 +40,9 @@ public class TeamDisplay extends javax.swing.JPanel {
         this.base = base;
         this.teamID = teamID;
         lbName.setText(name);
+        salary = sal;
         lbSalary.setText("$" + sal);
+        this.name = name;
         this.caller = caller;
         
         //Populate the display table with any player belonging to this team
@@ -306,7 +311,26 @@ public class TeamDisplay extends javax.swing.JPanel {
         base.switchPanel(base, caller);
     }//GEN-LAST:event_btCancelActionPerformed
 
-
+    /* Bunch of getters */
+    public JTable getPlayersTable() {
+        return tblPlayers;
+    }
+    
+    public TeamList getTeamList() {
+        return caller;
+    }
+    
+    public int getTeamID() {
+        return teamID;
+    }
+    
+    public int getSalary() {
+        return salary;
+    }
+    
+    public String getName() {
+        return name;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
     private javax.swing.JButton btCancel;

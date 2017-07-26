@@ -312,7 +312,7 @@ public class PositionalSearch extends javax.swing.JPanel {
         Object[] options = {"Yes", "No"};
         //Yes = 0, No = 1
         int optionChosen = JOptionPane.showOptionDialog(base, 
-                       "Career statistics only (click no to show individual season statistics) ?",
+                       "Career statistics only (click no to use individual season statistics) ?",
                        "Career statistics?",
                        JOptionPane.YES_NO_OPTION,
                        JOptionPane.QUESTION_MESSAGE,
@@ -349,7 +349,7 @@ public class PositionalSearch extends javax.swing.JPanel {
         
         if (dtm != null) {
             //display the results in a new Results panel
-            base.switchPanel(base, new Results(base, caller, this, dtm));
+            base.switchPanel(base, new Results(base, caller, this, dtm, teamID));
         }
         
         
@@ -368,10 +368,36 @@ public class PositionalSearch extends javax.swing.JPanel {
             String query = null;
             //If the statistics should be averaged across a career, follow this path.
             if (careerOnly == CAREER_ONLY_SEARCH) {
+                query = "SELECT P.playerID, P.nameFirst, P.nameLast, P.debut, P.finalGame "
+                        + "FROM player P, "
+                        + "(SELECT playerID, SUM(atBats) AS atBats, SUM(hits) AS hits, "
+                        + "SUM(homeRuns) AS homeRuns, SUM(rbi) AS rbi, SUM(baseOnBalls) AS baseOnBalls, "
+                        + "SUM(strikeouts) AS strikeouts "
+                        + "FROM batting "
+                        + "GROUP BY playerID) AS B "
+                        + "WHERE P.playerID = B.playerID AND "
+                        + "B.atBats" + comps[0] + params[0] + " AND "
+                        + "B.hits" + comps[1] + params[1] + " AND "
+                        + "B.homeRuns" + comps[2] + params[2] + " AND "
+                        + "B.rbi" + comps[3] + params[3] + " AND "
+                        + "B.baseOnBalls" + comps[4] + params[4] + " AND "
+                        + "B.strikeouts" + comps[5] + params[5] + " "
+                        + "AND P.playerID IN ("
+                        + "SELECT DISTINCT P2.playerID "
+                        + "FROM player P2, "
+                        + "(SELECT playerID, SUM(errors) AS errors, SUM(games) AS games FROM fielding ";
+                if (params[8] != "ALL") {
+                    query = query + "WHERE position = '" + params[8] + "' ";
+                }
+                query = query + "GROUP BY playerID) AS F "
+                        + "WHERE F.playerID = P2.playerID AND "
+                        + "F.errors " + comps[6] + params[6] + " AND "
+                        + "F.games " + comps[7] + params[7] + ");";
+           
 
             } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
             else {
-               query = "SELECT DISTINCT P.playerID, P.nameFirst, P.nameLast " +
+               query = "SELECT DISTINCT P.playerID, P.nameFirst, P.nameLast, P.debut, P.finalGame " +
                        "FROM player P, " + 
                        "(SELECT playerID, yearID, SUM(atBats) AS atBats, SUM(hits) AS hits, " +
                        "SUM(homeRuns) AS homeRuns, SUM(rbi) AS rbi, SUM(baseOnBalls) AS baseOnBalls, " +
@@ -396,13 +422,11 @@ public class PositionalSearch extends javax.swing.JPanel {
                                "WHERE F.playerID = P2.playerID AND " +
                                "F.errors " + comps[6] + params[6] + " AND " +
                                "F.games " + comps[7] + params[7] + ");";
-                       
-                    
-                    stmt = conn.createStatement();
-                    rs = stmt.executeQuery(query);
-                    tableModelReturned = populateTableModel(rs);
-              
+                 
             }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+            tableModelReturned = populateTableModel(rs);
 
         } catch (SQLException e) {
             BaseballUtilities.printSQLException(e);
