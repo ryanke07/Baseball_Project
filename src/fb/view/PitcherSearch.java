@@ -7,6 +7,12 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -327,16 +333,101 @@ public class PitcherSearch extends javax.swing.JPanel {
         
         DefaultTableModel tableModelReturned = null;
         
-        //If the statistics should be averaged across a career, follow this path.
-        if (careerOnly == CAREER_ONLY_SEARCH) {
-            
-        } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
-        else {
-            
+           //Make sure you can get the Connection first
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            String query = null;
+
+            //If the statistics should be averaged across a career, follow this path.
+            if (careerOnly == CAREER_ONLY_SEARCH) {
+
+            } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
+            else {
+                query = "SELECT DISTINCT select distinct p.playerID, p.nameFirst, p.nameLast, p.debut, p.finalGame "
+                        + "from player p, "
+                        + "(select pi.yearID, pi.playerid, sum(pi.wins) as Wins, sum(pi.losses) as losses, "
+                        + "sum(pi.games) as Games, sum(pi.saves) as Saves, sum(pi.walks) as Walks, "
+                        + "sum(pi.strikeouts) as Strikeouts, avg(pi.era) as ERA "
+                        + "from pitching pi "
+                        + "group by pi.yearID, pi.playerID) as pit "
+                        + "where p.playerID = pit.playerID and "
+                        + "pit.wins " + comps[0] + params[0] + " AND "
+                        + "pit.losses" + comps[1] + params[1] + " AND "
+                        + "pit.games" + comps[2] + params[2] + " AND "
+                        + "pit.saves" + comps[3] + params[3] + " AND "
+                        + "pit.walks" + comps[4] + params[4] + " AND "
+                        + "pit.strikeouts" + comps[5] + params[5] + " AND "
+                        + "pit.era" + comps[6] + params[6] + " "
+                        + "p.playerID in (select distinct p2.playerID "
+                        + "from player p2, (select f.playerID, f.yearID, sum(f.errors) as Err "
+                        + "from fielding f "
+                        + "group by f.yearid,f.playerID) as fi " 
+                        + " where p2.playerID =  fi.playerID and "
+                        + "fi.err " + comps[7] + params[7] + "); ";
+     
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+            tableModelReturned = populateTableModel(rs);
+
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+            try {
+                conn.close();
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                //TODO add clean up
+                BaseballUtilities.printSQLException(e);
+            }
         }
+        
+    
         
         return tableModelReturned;
     }
+    
+    private DefaultTableModel populateTableModel(ResultSet rs) {
+        
+        try {
+            ResultSetMetaData meta = rs.getMetaData();
+            
+            //Table Header
+            Vector<String> cols = new Vector<String>();
+            int numCols = meta.getColumnCount();
+            //numbering starts from 1!
+            for (int currCol = 1; currCol <= numCols; currCol++) {
+                cols.add(meta.getColumnName(currCol));
+            }
+            
+            //Table Body
+            Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+            while (rs.next()) {
+                Vector<Object> holder = new Vector<Object>();
+                for (int currCol = 1; currCol <= numCols; currCol++) {
+                    holder.add(rs.getObject(currCol));
+                }
+                data.add(holder);
+            }
+            
+            return new DefaultTableModel(data, cols);
+           // teamsTable.fireTableDataChanged();
+            
+        } catch (SQLException e) {
+            //TODO: add clean up
+            BaseballUtilities.printSQLException(e);
+        }
+        return null;
+    }
+    
     
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // Return to Team List
