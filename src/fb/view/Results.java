@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,12 +26,12 @@ public class Results extends javax.swing.JPanel {
     private final String file = "baseballpic.jpg";
     private MainBaseballFrame base;
     private TeamDisplay ancestor;
-    private PositionalSearch caller;
+    private JPanel caller;
     private int teamID;
     /**
      * Creates new form Results
      */
-    public Results(MainBaseballFrame base, TeamDisplay ancestor, PositionalSearch caller,
+    public Results(MainBaseballFrame base, TeamDisplay ancestor, JPanel caller,
                     DefaultTableModel model, int teamID) {
         initComponents();
         this.base = base;
