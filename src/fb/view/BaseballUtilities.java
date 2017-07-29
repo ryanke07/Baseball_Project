@@ -62,6 +62,8 @@ public class BaseballUtilities {
           String l;
           while ((l = br.readLine()) != null) {
               String result[] = l.split("\\s");
+              
+              if (result.length == 1) return false;
 
               if (result[0] != null && result[1] != null && 
                       result[0].equals(username) && 

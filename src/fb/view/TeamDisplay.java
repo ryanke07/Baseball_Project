@@ -7,6 +7,7 @@ package src.fb.view;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -126,6 +127,7 @@ public class TeamDisplay extends javax.swing.JPanel {
         btDelete = new javax.swing.JButton();
         btAdd = new javax.swing.JButton();
         btCancel = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Optima", 0, 24)); // NOI18N
         jLabel1.setText("Team Display");
@@ -178,6 +180,13 @@ public class TeamDisplay extends javax.swing.JPanel {
             }
         });
 
+        btnClear.setText("Clear Team.");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -199,15 +208,18 @@ public class TeamDisplay extends javax.swing.JPanel {
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btCancel)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btReview)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btDelete)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btAdd)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addComponent(btReview)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btDelete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btAdd)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(btnClear)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btCancel)
+                        .addGap(139, 139, 139))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -227,7 +239,9 @@ public class TeamDisplay extends javax.swing.JPanel {
                     .addComponent(btDelete)
                     .addComponent(btAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btCancel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btCancel)
+                    .addComponent(btnClear))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -245,7 +259,6 @@ public class TeamDisplay extends javax.swing.JPanel {
           stmt = conn.createStatement();
           int ret = stmt.executeUpdate(deleteQuery);
           
-          //Do we want to print a message indicating failure?
           
           //Repopulate
           rs = stmt.executeQuery("select P.playerID, P.nameFirst, P.nameLast,"
@@ -311,15 +324,49 @@ public class TeamDisplay extends javax.swing.JPanel {
         base.switchPanel(base, caller);
     }//GEN-LAST:event_btCancelActionPerformed
 
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // Calls the stored procedure to clear the team
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        
+        try {
+            stmt = conn.createStatement();
+            CallableStatement myCS = conn.prepareCall("{call clear_team(?)}");
+            myCS.setInt(1, teamID);
+            myCS.executeUpdate();
+            //Redraw
+            rs = stmt.executeQuery("select P.playerID, P.nameFirst, P.nameLast,"
+                    + " P.debut, P.finalGame "
+                    + "from on_user_team U, player P "
+                    + "where U.playerID = P.playerID AND "
+                    + "U.teamID = " + teamID + ";");
+            populatePlayersTable(rs);
+
+            ((DefaultTableModel) tblPlayers.getModel()).fireTableDataChanged();
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+             try {
+              if (conn != null) { conn.close(); }
+              if (stmt != null) { stmt.close(); }
+              if (rs != null) {rs.close(); }
+            } catch (SQLException e) {
+              BaseballUtilities.printSQLException(e);
+            }
+        }
+    }//GEN-LAST:event_btnClearActionPerformed
+
     /* Bunch of getters */
     public JTable getPlayersTable() {
         return tblPlayers;
     }
-    
+
     public TeamList getTeamList() {
         return caller;
     }
-    
+
     public int getTeamID() {
         return teamID;
     }
@@ -336,6 +383,7 @@ public class TeamDisplay extends javax.swing.JPanel {
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btDelete;
     private javax.swing.JButton btReview;
+    private javax.swing.JButton btnClear;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

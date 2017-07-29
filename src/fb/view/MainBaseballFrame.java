@@ -55,7 +55,6 @@ public class MainBaseballFrame extends JFrame
           
           pd.addWindowListener(new WindowAdapter() {
               @Override public void windowClosing(WindowEvent e) {
-                  //TODO: more graceful way?
                   System.exit(1);
               }
           }); 
@@ -64,7 +63,7 @@ public class MainBaseballFrame extends JFrame
           //user inputs login information and we move on to next screen
           String[] loginInfo = pd.getValidatedText();
           if (loginInfo != null) {
-            user = loginInfo[0];
+            user = loginInfo[0]; 
             password = loginInfo[1];
             tl = new TeamList(MainBaseballFrame.this);
             switchPanel(MainBaseballFrame.this, tl);

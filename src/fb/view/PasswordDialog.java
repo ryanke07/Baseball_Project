@@ -31,8 +31,8 @@ public class PasswordDialog extends javax.swing.JDialog {
         loginButton.addActionListener(new ActionListener() {
             
             public void actionPerformed(ActionEvent evt) {
-                login = usernameField.getText();
-                password = passwordField.getText();
+                login = usernameField.getText(); 
+                password = passwordField.getText(); 
                 
                 boolean isValid = BaseballUtilities.checkLogin(login, password);
                 
