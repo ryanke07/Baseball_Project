@@ -366,7 +366,7 @@ public class PositionalSearch extends javax.swing.JPanel {
       
         try {
             String query = null;
-            //If the statistics should be averaged across a career, follow this path.
+            //If the statistics should be considered across a career, follow this path.
             if (careerOnly == CAREER_ONLY_SEARCH) {
                 query = "SELECT P.playerID, P.nameFirst, P.nameLast, P.debut, P.finalGame "
                         + "FROM player P, "

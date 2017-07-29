@@ -346,8 +346,29 @@ public class PitcherSearch extends javax.swing.JPanel {
         try {
             String query = null;
 
-            //If the statistics should be averaged across a career, follow this path.
+            //If the statistics should be considered across a career, follow this path.
             if (careerOnly == CAREER_ONLY_SEARCH) {
+                query = "select p.playerID, p.nameFirst, p.nameLast, p.debut, p.finalGame "
+                        + "from player p, "
+                        + "(select pi.playerid, sum(pi.wins) as Wins, sum(pi.losses) as Losses, "
+                        + "sum(pi.games) as Games, sum(pi.saves) as Saves, sum(pi.walks) as Walks, "
+                        + "sum(pi.strikeouts) as Strikeouts, avg(pi.era) as ERA "
+                        + "from pitching pi "
+                        + "group by pi.playerID) as pit "
+                        + "where p.playerID = pit.playerID and "
+                        + "pit.Wins " + comps[0] + params[0] + " AND "
+                        + "pit.Losses" + comps[1] + params[1] + " AND "
+                        + "pit.Games" + comps[7] + params[7] + " AND "
+                        + "pit.Saves" + comps[2] + params[2] + " AND "
+                        + "pit.Walks" + comps[3] + params[3] + " AND "
+                        + "pit.Strikeouts" + comps[4] + params[4] + " AND "
+                        + "pit.ERA" + comps[5] + params[5] + " AND "
+                        + "p.playerID in (select distinct p2.playerID "
+                        + "from player p2, (select f.playerID, sum(f.errors) as Err "
+                        + "from fielding f "
+                        + "group by f.playerID) as fi " 
+                        + " where p2.playerID =  fi.playerID AND "
+                        + "fi.err " + comps[6] + params[6] + "); ";
 
             } //otherwise, output statistics for each player for each year they played (project the 'year' attribute)
             else {
