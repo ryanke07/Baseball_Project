@@ -7,6 +7,7 @@ package src.fb.view;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,6 +18,10 @@ import javax.swing.table.DefaultTableModel;
  * @author dianeyanke
  */
 public class PlayerDisplay extends javax.swing.JPanel {
+    
+    private final static int PITCHER = 0;
+    private final static int POSITIONAL = 1;
+    private String ls = System.getProperty("line.separator");
 
     private MainBaseballFrame mbf;
     private Results caller;
@@ -40,22 +45,68 @@ public class PlayerDisplay extends javax.swing.JPanel {
     }
 
     private void findAndDisplayStatistics(String playerID) {
-        //First step: use the stored procedures get_totals and get_years to create 
+        //First step: use the stored procedure get_seasons to create 
         //the average statistics across the players career
         Connection conn = ConnectionSupplier.getMyConnection();
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
+        String query = null;
         
         
         try {
-            stmt = conn.createStatement();
-            CallableStatement myCS = conn.prepareCall("{call get_years(?, ?)}");
-            System.out.println(playerID);
+            
+            //get the # of seasons first
+            CallableStatement myCS = conn.prepareCall("{call get_seasons(?, ?)}");
             myCS.setString(1, playerID);
             myCS.execute();
-            int years = myCS.getInt(2);
+            int years = myCS.getInt(2);  //tested on Willie Mays
             
-            System.out.println(years);
+            //Two paths: pitcher or positional
+            if (playerType == POSITIONAL) {
+                query = "SELECT Bat.playerID, SUM(atBats) as AB, SUM(hits) as H, " +
+                        "SUM(homeRuns) as HR, SUM(rbi) as RBI, SUM(baseOnBalls) as B, " +
+                        "SUM(strikeouts) as K, SUM(errors) as E, SUM(games) as G " +
+                        "FROM batting Bat INNER JOIN fielding Field ON " +
+                        "Bat.playerID = Field.playerID " +
+                        "WHERE Bat.playerID = ? " + 
+                        "GROUP BY Bat.playerID;";
+                stmt = conn.prepareStatement(query);
+                stmt.setString(1, playerID);
+                rs = stmt.executeQuery();
+                //get the single row result and print the data
+                while (rs.next()) {
+                    String s = "BATTING" + ls +
+                               "At Bats: " + (Double.parseDouble(rs.getObject(2).toString()))/years + ls +
+                               "Hits: " + (Double.parseDouble(rs.getObject(3).toString()))/years + ls +
+                               "Home Runs: " + (Double.parseDouble(rs.getObject(4).toString()))/years + ls +
+                               "RBI(s): " + (Double.parseDouble(rs.getObject(5).toString()))/years + ls +
+                               "Base on Balls: " + (Double.parseDouble(rs.getObject(6).toString()))/years + ls +
+                               "Strikeouts: " + (Double.parseDouble(rs.getObject(7).toString()))/years + ls +
+                               "FIELDING" + ls +
+                               "Errors: " + (Double.parseDouble(rs.getObject(8).toString()))/years + ls +
+                               "Games: " + (Double.parseDouble(rs.getObject(9).toString()))/years + ls;
+               
+                    taStatistics.setText(s);
+                }
+            } else { //pitcher path
+                query = "SELECT Pitch.playerID, SUM(wins) as W, SUM(losses) as L, " +
+                        "SUM(saves) as S, SUM(walks) as BB, SUM(strikeouts) as K, " +
+                        "SUM(era) as ERA, SUM(errors) as E, SUM(games) as G " +
+                        "FROM pitching Pitch INNER JOIN fielding Field ON " +
+                        "Pitch.playerID = Field.playerID " +
+                         "WHERE Pitch.playerID = ? AND " +
+                        "GROUP BY Pitch.playerID;";
+                stmt = conn.prepareStatement(query);
+                stmt.setString(1, playerID);
+                rs = stmt.executeQuery();
+                //get the single row result and print the data
+                while (rs.next()) {
+                    
+                }
+            }
+            
+            
+            
             
         } catch (SQLException e) {
             BaseballUtilities.printSQLException(e);
