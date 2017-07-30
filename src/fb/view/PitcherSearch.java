@@ -29,6 +29,7 @@ public class PitcherSearch extends javax.swing.JPanel {
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
     private static final int CAREER_ONLY_SEARCH = 0;
+    private final static int PITCHER = 0;
     private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
     //some instance fields
     private MainBaseballFrame base;
@@ -321,7 +322,7 @@ public class PitcherSearch extends javax.swing.JPanel {
         
         if (dtm != null) {
             //display the results in a new Results panel
-            base.switchPanel(base, new Results(base, caller, this, dtm, teamID));
+            base.switchPanel(base, new Results(base, caller, this, dtm, teamID, PITCHER));
         }
     }//GEN-LAST:event_btnSearchActionPerformed
 

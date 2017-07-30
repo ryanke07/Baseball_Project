@@ -24,21 +24,26 @@ public class Results extends javax.swing.JPanel {
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
+    private final static int PITCHER = 0;
+    private final static int POSITIONAL = 1;
+    //general variables
     private MainBaseballFrame base;
     private TeamDisplay ancestor;
     private JPanel caller;
     private int teamID;
+    private int playerType; 
     /**
      * Creates new form Results
      */
     public Results(MainBaseballFrame base, TeamDisplay ancestor, JPanel caller,
-                    DefaultTableModel model, int teamID) {
+                    DefaultTableModel model, int teamID, int playerType) {
         initComponents();
         this.base = base;
         this.ancestor = ancestor;
         this.caller = caller;
         tblResults.setModel(model);
         this.teamID = teamID;
+        this.playerType = playerType;
     }
 
     /**
@@ -55,7 +60,7 @@ public class Results extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblResults = new javax.swing.JTable();
         btAdd = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btReview = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Optima", 0, 24)); // NOI18N
@@ -83,7 +88,12 @@ public class Results extends javax.swing.JPanel {
             }
         });
 
-        jButton2.setText("Review Player.");
+        btReview.setText("Review Player.");
+        btReview.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btReviewActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText("Cancel.");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -112,7 +122,7 @@ public class Results extends javax.swing.JPanel {
                                 .addGap(15, 15, 15)
                                 .addComponent(btAdd)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)
+                                .addComponent(btReview)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnCancel)))
                         .addGap(0, 20, Short.MAX_VALUE)))
@@ -130,7 +140,7 @@ public class Results extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btAdd)
-                    .addComponent(jButton2)
+                    .addComponent(btReview)
                     .addComponent(btnCancel))
                 .addContainerGap())
         );
@@ -173,11 +183,24 @@ public class Results extends javax.swing.JPanel {
                                                 ancestor.getName()));
     }//GEN-LAST:event_btAddActionPerformed
 
+    private void btReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btReviewActionPerformed
+        // Get the selected row's information and pass it along to the PlayerDisplay class.
+        String[] playerInfo = new String[3]; //0 = playerID, 1 = firstName, 2 = lastName
+        //Figure out what the teamID is for the selected row
+        int selectedRow = tblResults.getSelectedRow();
+        if (selectedRow < 0) return;
+        playerInfo[0] = (String) tblResults.getValueAt(selectedRow, 0);
+        playerInfo[1] = (String) tblResults.getValueAt(selectedRow, 1);
+        playerInfo[2] = (String) tblResults.getValueAt(selectedRow, 2);
+        //Construct a new Team Display pane and add it to the main frame
+        base.switchPanel(base, new PlayerDisplay(base, this, playerInfo, playerType));
+    }//GEN-LAST:event_btReviewActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
+    private javax.swing.JButton btReview;
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

@@ -29,6 +29,7 @@ public class PositionalSearch extends javax.swing.JPanel {
     private final String file = "baseballpic.jpg";
     private String[] comparisonOperators = { " < ", " <= ", " = ", " >= ", " > ", "none" };
     private String[] positions = { "C", "1B", "2B", "3B", "OF", "SS", "ALL" };
+    private final static int POSITIONAL = 1;
     private static final int CAREER_ONLY_SEARCH = 0;
     //Some instance fields
     private MainBaseballFrame base;
@@ -349,7 +350,7 @@ public class PositionalSearch extends javax.swing.JPanel {
         
         if (dtm != null) {
             //display the results in a new Results panel
-            base.switchPanel(base, new Results(base, caller, this, dtm, teamID));
+            base.switchPanel(base, new Results(base, caller, this, dtm, teamID, POSITIONAL));
         }
         
         
