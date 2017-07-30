@@ -18,7 +18,7 @@ import javax.swing.table.DefaultTableModel;
  * @author dianeyanke
  */
 public class PlayerDisplay extends javax.swing.JPanel {
-    
+
     private final static int PITCHER = 0;
     private final static int POSITIONAL = 1;
     private String ls = System.getProperty("line.separator");
@@ -27,6 +27,7 @@ public class PlayerDisplay extends javax.swing.JPanel {
     private Results caller;
     private String[] playerInfo;
     private int playerType;
+
     /**
      * Creates new form PlayerDisplay
      */
@@ -36,12 +37,12 @@ public class PlayerDisplay extends javax.swing.JPanel {
         this.caller = caller;
         this.playerInfo = playerInfo;
         this.playerType = playerType;
-        
+
         //Set the player's name (the title of the display window)
         lblName.setText(playerInfo[1] + " " + playerInfo[2]);
         //Set the textArea's text to describe the average career statistics
         findAndDisplayStatistics(playerInfo[0]);
-        
+
     }
 
     private void findAndDisplayStatistics(String playerID) {
@@ -51,75 +52,93 @@ public class PlayerDisplay extends javax.swing.JPanel {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query = null;
-        
-        
+
         try {
-            
+
             //get the # of seasons first
             CallableStatement myCS = conn.prepareCall("{call get_seasons(?, ?)}");
             myCS.setString(1, playerID);
             myCS.execute();
             int years = myCS.getInt(2);  //tested on Willie Mays
-            
+
             //Two paths: pitcher or positional
             if (playerType == POSITIONAL) {
-                query = "SELECT Bat.playerID, SUM(atBats) as AB, SUM(hits) as H, " +
-                        "SUM(homeRuns) as HR, SUM(rbi) as RBI, SUM(baseOnBalls) as B, " +
-                        "SUM(strikeouts) as K, SUM(errors) as E, SUM(games) as G " +
-                        "FROM batting Bat INNER JOIN fielding Field ON " +
-                        "Bat.playerID = Field.playerID " +
-                        "WHERE Bat.playerID = ? " + 
-                        "GROUP BY Bat.playerID;";
+                query = "SELECT Bat.playerID, SUM(atBats) as AB, SUM(hits) as H, "
+                        + "SUM(homeRuns) as HR, SUM(rbi) as RBI, SUM(baseOnBalls) as B, "
+                        + "SUM(strikeouts) as K, SUM(errors) as E, SUM(games) as G "
+                        + "FROM batting Bat INNER JOIN fielding Field ON "
+                        + "Bat.playerID = Field.playerID AND "
+                        + "Bat.yearID = Field.yearID AND "
+                        + "Bat.teamID = Field.teamID "
+                        + "WHERE Bat.playerID = ? "
+                        + "GROUP BY Bat.playerID;";
                 stmt = conn.prepareStatement(query);
                 stmt.setString(1, playerID);
                 rs = stmt.executeQuery();
                 //get the single row result and print the data
                 while (rs.next()) {
-                    String s = "BATTING" + ls +
-                               "At Bats: " + (Double.parseDouble(rs.getObject(2).toString()))/years + ls +
-                               "Hits: " + (Double.parseDouble(rs.getObject(3).toString()))/years + ls +
-                               "Home Runs: " + (Double.parseDouble(rs.getObject(4).toString()))/years + ls +
-                               "RBI(s): " + (Double.parseDouble(rs.getObject(5).toString()))/years + ls +
-                               "Base on Balls: " + (Double.parseDouble(rs.getObject(6).toString()))/years + ls +
-                               "Strikeouts: " + (Double.parseDouble(rs.getObject(7).toString()))/years + ls +
-                               "FIELDING" + ls +
-                               "Errors: " + (Double.parseDouble(rs.getObject(8).toString()))/years + ls +
-                               "Games: " + (Double.parseDouble(rs.getObject(9).toString()))/years + ls;
-               
+                    String s = "BATTING" + ls
+                            + "At Bats: " + (int) (Double.parseDouble(rs.getObject(2).toString())) / years + ls
+                            + "Hits: " + (int) (Double.parseDouble(rs.getObject(3).toString())) / years + ls
+                            + "Home Runs: " + (int) (Double.parseDouble(rs.getObject(4).toString())) / years + ls
+                            + "RBI(s): " + (int) (Double.parseDouble(rs.getObject(5).toString())) / years + ls
+                            + "Base on Balls: " + (int) (Double.parseDouble(rs.getObject(6).toString())) / years + ls
+                            + "Strikeouts: " + (int) (Double.parseDouble(rs.getObject(7).toString())) / years + ls
+                            + "FIELDING" + ls
+                            + "Errors: " + (int) (Double.parseDouble(rs.getObject(8).toString())) / years + ls
+                            + "Games: " + (int) (Double.parseDouble(rs.getObject(9).toString())) / years + ls;
+
                     taStatistics.setText(s);
                 }
             } else { //pitcher path
-                query = "SELECT Pitch.playerID, SUM(wins) as W, SUM(losses) as L, " +
-                        "SUM(saves) as S, SUM(walks) as BB, SUM(strikeouts) as K, " +
-                        "SUM(era) as ERA, SUM(errors) as E, SUM(games) as G " +
-                        "FROM pitching Pitch INNER JOIN fielding Field ON " +
-                        "Pitch.playerID = Field.playerID " +
-                         "WHERE Pitch.playerID = ? AND " +
-                        "GROUP BY Pitch.playerID;";
+                query = "SELECT Pitch.playerID, SUM(wins) as W, SUM(losses) as L, "
+                        + "SUM(saves) as S, SUM(walks) as BB, SUM(strikeouts) as K, "
+                        + "SUM(era) as ERA, SUM(errors) as E, SUM(Field.games) as G "
+                        + "FROM pitching Pitch INNER JOIN fielding Field ON "
+                        + "Pitch.playerID = Field.playerID AND "
+                        + "Pitch.yearID = Field.yearID AND "
+                        + "Pitch.teamID = Field.teamID "
+                        + "WHERE Pitch.playerID = ? "
+                        + "GROUP BY Pitch.playerID;";
                 stmt = conn.prepareStatement(query);
                 stmt.setString(1, playerID);
                 rs = stmt.executeQuery();
                 //get the single row result and print the data
                 while (rs.next()) {
-                    
+                    String s = "PITCHING" + ls
+                            + "Wins: " + (int) (Double.parseDouble(rs.getObject(2).toString())) / years + ls
+                            + "Losses: " + (int) (Double.parseDouble(rs.getObject(3).toString())) / years + ls
+                            + "Saves: " + (int) (Double.parseDouble(rs.getObject(4).toString())) / years + ls
+                            + "Walks: " + (int) (Double.parseDouble(rs.getObject(5).toString())) / years + ls
+                            + "Strikeouts: " + (int) (Double.parseDouble(rs.getObject(6).toString())) / years + ls
+                            + "Earned Run Average: " + (Double.parseDouble(rs.getObject(7).toString())) / years + ls
+                            + "FIELDING" + ls
+                            + "Errors: " + (int) (Double.parseDouble(rs.getObject(8).toString())) / years + ls
+                            + "Games: " + (int) (Double.parseDouble(rs.getObject(9).toString())) / years + ls;
+
+                    taStatistics.setText(s);
                 }
             }
-            
-            
-            
-            
+
         } catch (SQLException e) {
             BaseballUtilities.printSQLException(e);
         } finally {
-             try {
-              if (conn != null) { conn.close(); }
-              if (stmt != null) { stmt.close(); }
-              if (rs != null) {rs.close(); }
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
             } catch (SQLException e) {
-              BaseballUtilities.printSQLException(e);
+                BaseballUtilities.printSQLException(e);
             }
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -180,21 +199,19 @@ public class PlayerDisplay extends javax.swing.JPanel {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(jLabel3)
-                                                .addGap(34, 34, 34))
-                                            .addComponent(tfSalaries, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)))
-                                    .addGroup(layout.createSequentialGroup()
                                         .addGap(16, 16, 16)
-                                        .addComponent(btReturn))))))
+                                        .addComponent(btReturn))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel1)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                                .addComponent(tfSalaries, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
+                                            .addComponent(jLabel3)))))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(36, 36, 36)
-                        .addComponent(jLabel2)
-                        .addGap(50, 50, 50)
-                        .addComponent(jLabel1)))
+                        .addComponent(jLabel2)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
