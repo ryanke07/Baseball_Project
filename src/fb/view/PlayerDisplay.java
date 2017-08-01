@@ -42,6 +42,7 @@ public class PlayerDisplay extends javax.swing.JPanel {
         lblName.setText(playerInfo[1] + " " + playerInfo[2]);
         //Set the textArea's text to describe the average career statistics
         findAndDisplayStatistics(playerInfo[0]);
+        findAndDisplayStadiums(playerInfo[0]);
 
     }
 
@@ -120,6 +121,41 @@ public class PlayerDisplay extends javax.swing.JPanel {
                 }
             }
 
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                BaseballUtilities.printSQLException(e);
+            }
+        }
+    }
+    
+    private void findAndDisplayStadiums(String playerID) {
+        Connection conn = ConnectionSupplier.getMyConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        String query = "select distinct R.parkname from realteams R " +
+                       "where R.teamID IN " +
+                       "(select F.teamID from fielding F where F.playerID = '" + playerID +
+                       "' AND R.yearID = F.yearID);";
+        
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                taStadiums.append(rs.getString(1) + ls);
+            }
         } catch (SQLException e) {
             BaseballUtilities.printSQLException(e);
         } finally {
