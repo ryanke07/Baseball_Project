@@ -128,6 +128,7 @@ public class TeamDisplay extends javax.swing.JPanel {
         btAdd = new javax.swing.JButton();
         btCancel = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
+        btChangeName = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Optima", 0, 24)); // NOI18N
         jLabel1.setText("Team Display");
@@ -187,6 +188,13 @@ public class TeamDisplay extends javax.swing.JPanel {
             }
         });
 
+        btChangeName.setText("Change Name.");
+        btChangeName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btChangeNameActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -198,28 +206,36 @@ public class TeamDisplay extends javax.swing.JPanel {
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
                         .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(btReview)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btAdd)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addComponent(btnClear)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btCancel)
-                        .addGap(139, 139, 139))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(btReview)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btDelete)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnClear)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btChangeName)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(btCancel)
+                                .addGap(31, 31, 31))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btAdd)
+                                .addGap(0, 0, Short.MAX_VALUE))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -241,7 +257,8 @@ public class TeamDisplay extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btCancel)
-                    .addComponent(btnClear))
+                    .addComponent(btnClear)
+                    .addComponent(btChangeName))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -321,7 +338,7 @@ public class TeamDisplay extends javax.swing.JPanel {
 
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelActionPerformed
         // Return to the Team List
-        base.switchPanel(base, caller);
+        base.switchPanel(base, new TeamList(base));
     }//GEN-LAST:event_btCancelActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -358,6 +375,38 @@ public class TeamDisplay extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnClearActionPerformed
 
+    private void btChangeNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btChangeNameActionPerformed
+        // Prompt for input and change the name of the selected team.
+        String name = JOptionPane.showInputDialog(this, "Change name to: ");
+        Connection conn = null;
+        CallableStatement cs = null;
+        
+        conn = ConnectionSupplier.getMyConnection();
+        
+        System.out.println(teamID + " " + name);
+        
+        try {
+            cs = conn.prepareCall("{call change_name(?, ?)}");
+            cs.setInt(1, teamID);
+            cs.setString(2, name);
+            cs.execute();
+            lbName.setText(name);
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (cs != null) {
+                    cs.close();
+                }
+            } catch (SQLException e) {
+                BaseballUtilities.printSQLException(e);
+            }
+        }  
+    }//GEN-LAST:event_btChangeNameActionPerformed
+
     /* Bunch of getters */
     public JTable getPlayersTable() {
         return tblPlayers;
@@ -381,6 +430,7 @@ public class TeamDisplay extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAdd;
     private javax.swing.JButton btCancel;
+    private javax.swing.JButton btChangeName;
     private javax.swing.JButton btDelete;
     private javax.swing.JButton btReview;
     private javax.swing.JButton btnClear;
