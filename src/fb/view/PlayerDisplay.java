@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,14 +25,14 @@ public class PlayerDisplay extends javax.swing.JPanel {
     private String ls = System.getProperty("line.separator");
 
     private MainBaseballFrame mbf;
-    private Results caller;
+    private JPanel caller;
     private String[] playerInfo;
     private int playerType;
 
     /**
      * Creates new form PlayerDisplay
      */
-    public PlayerDisplay(MainBaseballFrame mbf, Results caller, String[] playerInfo, int playerType) {
+    public PlayerDisplay(MainBaseballFrame mbf, JPanel caller, String[] playerInfo, int playerType) {
         initComponents();
         this.mbf = mbf;
         this.caller = caller;
@@ -43,6 +44,7 @@ public class PlayerDisplay extends javax.swing.JPanel {
         //Set the textArea's text to describe the average career statistics
         findAndDisplayStatistics(playerInfo[0]);
         findAndDisplayStadiums(playerInfo[0]);
+        findAndDisplaySalary(playerInfo[0]);
 
     }
 
@@ -168,6 +170,41 @@ public class PlayerDisplay extends javax.swing.JPanel {
                 }
                 if (rs != null) {
                     rs.close();
+                }
+            } catch (SQLException e) {
+                BaseballUtilities.printSQLException(e);
+            }
+        }
+    }
+    
+    private void findAndDisplaySalary(String pid) {
+        Double salary = 0.0;
+        
+        Connection conn = ConnectionSupplier.getMyConnection();
+        CallableStatement cs = null;
+        
+        try {
+            cs = conn.prepareCall("{call get_sal(?,?)}");
+            cs.setString(1, pid);
+            cs.execute();
+            salary =  cs.getDouble(2);
+            
+            if (Math.abs(salary) < 0.1 && Math.abs(salary) > -0.1) {
+                tfSalaries.setText("Data not available for this player.");
+            }
+            else {
+                tfSalaries.setText(String.format("%.2f", salary.doubleValue()));
+            }
+            
+        } catch (SQLException e) {
+            BaseballUtilities.printSQLException(e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (cs != null) {
+                    cs.close();
                 }
             } catch (SQLException e) {
                 BaseballUtilities.printSQLException(e);

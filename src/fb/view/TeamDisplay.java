@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -27,6 +28,8 @@ public class TeamDisplay extends javax.swing.JPanel {
     private final String path =
       "/Users/dianeyanke/NetBeansProjects/FantasyBaseball/build/classes/src/fb/resources/";
     private final String file = "baseballpic.jpg";
+    private final static int PITCHER = 0;
+    private final static int POSITIONAL = 1;
     private MainBaseballFrame base;
     private TeamList caller;
     private int teamID;
@@ -159,6 +162,11 @@ public class TeamDisplay extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tblPlayers);
 
         btReview.setText("Review Player.");
+        btReview.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btReviewActionPerformed(evt);
+            }
+        });
 
         btDelete.setText("Delete Player.");
         btDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -406,6 +414,39 @@ public class TeamDisplay extends javax.swing.JPanel {
             }
         }  
     }//GEN-LAST:event_btChangeNameActionPerformed
+
+    private void btReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btReviewActionPerformed
+        // TODO get information and call PlayerDisplay
+        // Need --> positional or pitcher display? (prompt user)
+        // Need --> String[3] : 0 - id, 1 - firstname, 2 - lastname
+        
+        String[] info = new String[3];
+        
+        //Does the user want to add a pitcher or a positional player?
+        Object[] options = {"Cancel", "Positional Player", "Pitcher"};
+        int n = JOptionPane.showOptionDialog(base, 
+                       "What kind of statistics would you like to view?",
+                       "What Kind of Statistics?",
+                       JOptionPane.YES_NO_CANCEL_OPTION,
+                       JOptionPane.QUESTION_MESSAGE,
+                       null,
+                       options,
+                       options[2]);
+        
+        if (n == 0) return;
+        
+        int selectedRow = tblPlayers.getSelectedRow();
+        info[0] = (String) tblPlayers.getValueAt(selectedRow, 0);
+        info[1] = (String) tblPlayers.getValueAt(selectedRow, 1);
+        info[2] = (String) tblPlayers.getValueAt(selectedRow, 2);
+        
+        if (n == 2) {
+            base.switchPanel(base, new PlayerDisplay(base, this, info, PITCHER));
+        } else {
+            base.switchPanel(base, new PlayerDisplay(base, this, info, POSITIONAL));
+        }
+        
+    }//GEN-LAST:event_btReviewActionPerformed
 
     /* Bunch of getters */
     public JTable getPlayersTable() {
