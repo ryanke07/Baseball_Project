@@ -139,14 +139,14 @@ public class CreateTeam extends javax.swing.JPanel {
              teamName = "unknown";
          }
          
-         long salaryCap;
+         int salaryCap;
          try {
-             salaryCap = Long.parseLong(tfSalary.getText());
+             salaryCap = Integer.parseInt(tfSalary.getText());
              if (salaryCap == 0) {
-                 salaryCap = Long.MAX_VALUE;
+                 salaryCap = Integer.MAX_VALUE;
              }
          } catch (NumberFormatException ex) {
-             salaryCap = Long.MAX_VALUE;
+             salaryCap = Integer.MAX_VALUE;
          }
          
          //Retrieve the user's login information

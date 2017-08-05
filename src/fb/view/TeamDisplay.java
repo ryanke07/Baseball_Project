@@ -329,6 +329,7 @@ public class TeamDisplay extends javax.swing.JPanel {
             if (!roomEnough) {
                 JOptionPane.showMessageDialog(base, 
                         "You cannot have more than six pitchers per roster.");
+                return;
             }
             base.switchPanel(base, new PitcherSearch(base, this, teamID));
         } else if (n == 1) {
@@ -337,6 +338,7 @@ public class TeamDisplay extends javax.swing.JPanel {
             if (!roomEnough) {
                 JOptionPane.showMessageDialog(base, 
                         "You cannot have more than nine positional players per roster.");
+                return;
             }
             base.switchPanel(base, new PositionalSearch(base, this, teamID));
         } else { 
